@@ -1,6 +1,5 @@
 import praw
 import OAuth2Util
-from time import sleep
 
 FROM_SUBREDDIT = 'explainlikeimfive'
 TARGET_SUBREDDIT = 'ELI5_clone'
@@ -13,10 +12,14 @@ while True:
 
     try:
         for submission in praw.helpers.submission_stream(r, FROM_SUBREDDIT, limit=10, verbosity=0):
-            r.submit(TARGET_SUBREDDIT, submission.title, text=submission.text)
+
+            try:
+                r.submit(TARGET_SUBREDDIT, submission.title, text=submission.body)
+            except AttributeError:
+                r.submit(TARGET_SUBREDDIT, submission.title, text='')
+
+            print("Mirrored submission: " + submission.title)
 
     except Exception as e:
         print(e)
-        sleep(1)
-
 
